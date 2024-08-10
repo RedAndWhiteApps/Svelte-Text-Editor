@@ -3,7 +3,7 @@
 
 	function applyStyle(style: string, value: string = '') {
 		document.execCommand(style, false, value);
-		updateActiveButtons(); // Call this function to update button styles
+		updateActiveButtons(); // Update button styles immediately
 	}
 
 	function resetStyles() {
@@ -17,7 +17,7 @@
 		}
 
 		editorContent.style.textAlign = 'left'; // Reset alignment to default (left)
-		updateActiveButtons(); // Call this function to update button styles
+		updateActiveButtons(); // Update button styles immediately
 	}
 
 	function getContent() {
@@ -39,15 +39,17 @@
 		const alignments = ['left', 'center', 'right', 'justify'];
 		alignments.forEach((align) => {
 			const button = document.querySelector(`button[data-align=${align}]`);
-			if (document.queryCommandValue('justifyLeft') === 'true' && align === 'left' ||
-				document.queryCommandValue('justifyCenter') === 'true' && align === 'center' ||
-				document.queryCommandValue('justifyRight') === 'true' && align === 'right' ||
-				document.queryCommandValue('justifyFull') === 'true' && align === 'justify') {
+			if (editorContent.style.textAlign === align) {
 				button.classList.add('active');
 			} else {
 				button.classList.remove('active');
 			}
 		});
+	}
+
+	function applyAlignment(alignment: string) {
+		editorContent.style.textAlign = alignment;
+		updateActiveButtons(); // Update button styles immediately
 	}
 
 	document.addEventListener('selectionchange', updateActiveButtons); // Listen to cursor movements
@@ -76,16 +78,16 @@
 		<button on:click={() => applyStyle('insertUnorderedList')}>
 			<i class="fas fa-list-ul"></i>
 		</button>
-		<button data-align="left" on:click={() => (editorContent.style.textAlign = 'left')}>
+		<button data-align="left" on:click={() => applyAlignment('left')}>
 			<i class="fas fa-align-left"></i>
 		</button>
-		<button data-align="center" on:click={() => (editorContent.style.textAlign = 'center')}>
+		<button data-align="center" on:click={() => applyAlignment('center')}>
 			<i class="fas fa-align-center"></i>
 		</button>
-		<button data-align="right" on:click={() => (editorContent.style.textAlign = 'right')}>
+		<button data-align="right" on:click={() => applyAlignment('right')}>
 			<i class="fas fa-align-right"></i>
 		</button>
-		<button data-align="justify" on:click={() => (editorContent.style.textAlign = 'justify')}>
+		<button data-align="justify" on:click={() => applyAlignment('justify')}>
 			<i class="fas fa-align-justify"></i>
 		</button>
 		<button on:click={resetStyles}>
