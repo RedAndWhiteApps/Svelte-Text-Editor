@@ -23,6 +23,9 @@
   }
 </script>
 
+<!-- Include FontAwesome or your preferred icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <style>
   .editor-container {
     border: 1px solid #ccc;
@@ -32,27 +35,64 @@
 
   .toolbar button, .toolbar select {
     margin-right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .toolbar button i {
+    font-size: 18px;
+    color: #333;
+  }
+
+  .toolbar button:hover i {
+    color: #000;
   }
 
   .editor {
     min-height: 200px;
     outline: none;
   }
+
+  .toolbar select {
+    padding: 2px;
+    font-size: 16px;
+  }
 </style>
 
 <div>
   <div class="toolbar">
-    <button on:click={() => applyStyle('bold')}>Bold</button>
-    <button on:click={() => applyStyle('italic')}>Italic</button>
-    <button on:click={() => applyStyle('underline')}>Underline</button>
-    <button on:click={() => applyStyle('insertOrderedList')}>Ordered List</button>
-    <button on:click={() => applyStyle('insertUnorderedList')}>Unordered List</button>
-    <button on:click={() => editorContent.style.textAlign = 'left'}>Align Left</button>
-    <button on:click={() => editorContent.style.textAlign = 'center'}>Align Center</button>
-    <button on:click={() => editorContent.style.textAlign = 'right'}>Align Right</button>
-    <button on:click={() => editorContent.style.textAlign = 'justify'}>Justify</button>
-    <button on:click={resetStyles}>Reset Styles</button>
-    <!-- <button on:click={getContent}>Get Content</button> -->
+    <button on:click={() => applyStyle('bold')}>
+      <i class="fas fa-bold"></i>
+    </button>
+    <button on:click={() => applyStyle('italic')}>
+      <i class="fas fa-italic"></i>
+    </button>
+    <button on:click={() => applyStyle('underline')}>
+      <i class="fas fa-underline"></i>
+    </button>
+    <button on:click={() => applyStyle('insertOrderedList')}>
+      <i class="fas fa-list-ol"></i>
+    </button>
+    <button on:click={() => applyStyle('insertUnorderedList')}>
+      <i class="fas fa-list-ul"></i>
+    </button>
+    <button on:click={() => editorContent.style.textAlign = 'left'}>
+      <i class="fas fa-align-left"></i>
+    </button>
+    <button on:click={() => editorContent.style.textAlign = 'center'}>
+      <i class="fas fa-align-center"></i>
+    </button>
+    <button on:click={() => editorContent.style.textAlign = 'right'}>
+      <i class="fas fa-align-right"></i>
+    </button>
+    <button on:click={() => editorContent.style.textAlign = 'justify'}>
+      <i class="fas fa-align-justify"></i>
+    </button>
+    <button on:click={resetStyles}>
+      <i class="fas fa-undo"></i>
+    </button>
     <select on:change={(event) => applyStyle('fontSize', event.target.value)}>
       <option value="3">Font Size</option>
       <option value="1">10px</option>
