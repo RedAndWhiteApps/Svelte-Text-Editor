@@ -1,98 +1,111 @@
 <script lang="ts">
 	let editorContent: HTMLElement;
 
-	function applyStyle(style: string, value: string = '') {
-		document.execCommand(style, false, value);
-		updateActiveButtons(); // Update button styles immediately
-	}
+function applyStyle(style: string, value: string = '') {
+    document.execCommand(style, false, value);
+    updateActiveButtons(); // Update button styles immediately
+}
 
-	function resetStyles() {
-		if (editorContent) {
-			const plainText = editorContent.innerText || editorContent.textContent;
-			editorContent.innerHTML = plainText;
-		}
+function resetStyles() {
+    if (editorContent) {
+        const plainText = editorContent.innerText || editorContent.textContent;
+        editorContent.innerHTML = plainText;
+    }
 
-		editorContent.style.textAlign = 'left'; // Reset alignment to default (left)
-		updateActiveButtons(); // Update button styles immediately
-	}
+    editorContent.style.textAlign = 'left'; // Reset alignment to default (left)
+    updateActiveButtons(); // Update button styles immediately
+}
 
-	function getContent() {
-		alert(editorContent.innerHTML);
-	}
+function getContent() {
+    alert(editorContent.innerHTML);
+}
 
-	function updateActiveButtons() {
-		const commands = ['bold', 'italic', 'underline'];
-		commands.forEach((command) => {
-			const button = document.querySelector(`button[data-command=${command}]`);
-			if (document.queryCommandState(command)) {
-				button.classList.add('active');
-			} else {
-				button.classList.remove('active');
-			}
-		});
+function updateActiveButtons() {
+    const commands = ['bold', 'italic', 'underline'];
+    commands.forEach((command) => {
+        const button = document.querySelector(`button[data-command=${command}]`);
+        if (document.queryCommandState(command)) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
 
-		// Text alignment
-		const alignments = ['left', 'center', 'right', 'justify'];
-		alignments.forEach((align) => {
-			const button = document.querySelector(`button[data-align=${align}]`);
-			if (editorContent.style.textAlign === align) {
-				button.classList.add('active');
-			} else {
-				button.classList.remove('active');
-			}
-		});
+    // Text alignment
+    const alignments = ['left', 'center', 'right', 'justify'];
+    alignments.forEach((align) => {
+        const button = document.querySelector(`button[data-align=${align}]`);
+        if (editorContent.style.textAlign === align) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
 
-		// Font family
-		const fontFamilySelect = document.querySelector('select[data-font-family]');
-		const currentFont = document.queryCommandValue('fontName').replace(/"/g, '');
-		fontFamilySelect.value = currentFont;
+    // Font family
+    const fontFamilySelect = document.querySelector('select[data-font-family]') as HTMLSelectElement;
+    const currentFont = document.queryCommandValue('fontName').replace(/"/g, '');
+    fontFamilySelect.value = currentFont;
 
-		// Font size
-		const fontSizeSelect = document.querySelector('select[data-font-size]');
-		const currentFontSize = document.queryCommandValue('fontSize');
-		fontSizeSelect.value = currentFontSize;
-	}
+    // Font size
+    const fontSizeSelect = document.querySelector('select[data-font-size]') as HTMLSelectElement;
+    const currentFontSize = document.queryCommandValue('fontSize');
+    fontSizeSelect.value = currentFontSize;
+}
 
-	function applyAlignment(alignment: string) {
-		editorContent.style.textAlign = alignment;
-		updateActiveButtons(); // Update button styles immediately
-	}
+function applyAlignment(alignment: string) {
+    editorContent.style.textAlign = alignment;
+    updateActiveButtons(); // Update button styles immediately
+}
 
-	function applyFontFamily(fontFamily: string) {
-		document.execCommand('fontName', false, fontFamily);
-		updateActiveButtons(); // Update button styles immediately
-	}
+function applyFontFamily(fontFamily: string) {
+    document.execCommand('fontName', false, fontFamily);
+    updateActiveButtons(); // Update button styles immediately
+}
 
-	function applyFontSize(fontSize: string) {
-		document.execCommand('fontSize', false, fontSize);
-		updateActiveButtons(); // Update button styles immediately
-	}
+function applyFontSize(fontSize: string) {
+    document.execCommand('fontSize', false, fontSize);
+    updateActiveButtons(); // Update button styles immediately
+}
 
-	function undo() {
-		document.execCommand('undo');
-	}
+function undo() {
+    document.execCommand('undo');
+}
 
-	function redo() {
-		document.execCommand('redo');
-	}
+function redo() {
+    document.execCommand('redo');
+}
 
-	document.addEventListener('selectionchange', updateActiveButtons); // Listen to cursor movements
+document.addEventListener('selectionchange', updateActiveButtons); // Listen to cursor movements
 
-	// Add keyboard shortcuts for undo and redo
-	document.addEventListener('keydown', (event) => {
-		if (event.ctrlKey) {
-			switch (event.key) {
-				case 'z':
-					event.preventDefault();
-					undo();
-					break;
-				case 'y':
-					event.preventDefault();
-					redo();
-					break;
-			}
-		}
-	});
+// Add keyboard shortcuts for undo, redo, and other formatting
+document.addEventListener('keydown', (event) => {
+    if (event.ctrlKey) {
+        switch (event.key.toLowerCase()) {
+            case 'z':
+                event.preventDefault();
+                undo();
+                break;
+            case 'y':
+                event.preventDefault();
+                redo();
+                break;
+            case 'b':
+                event.preventDefault();
+                applyStyle('bold');
+                break;
+            case 'i':
+                event.preventDefault();
+                applyStyle('italic');
+                break;
+            case 'u':
+                event.preventDefault();
+                applyStyle('underline');
+                break;
+        }
+    }
+});
+
 </script>
 
 <!-- Include FontAwesome or your preferred icon library -->
