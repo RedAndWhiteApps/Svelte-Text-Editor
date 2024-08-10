@@ -7,12 +7,8 @@
 	}
 
 	function resetStyles() {
-		// Clear HTML Tags
 		if (editorContent) {
-			// Get the plain text content of the element by using innerText or textContent
 			const plainText = editorContent.innerText || editorContent.textContent;
-
-			// Clear the element's content and set it to the plain text
 			editorContent.innerHTML = plainText;
 		}
 
@@ -72,7 +68,31 @@
 		updateActiveButtons(); // Update button styles immediately
 	}
 
+	function undo() {
+		document.execCommand('undo');
+	}
+
+	function redo() {
+		document.execCommand('redo');
+	}
+
 	document.addEventListener('selectionchange', updateActiveButtons); // Listen to cursor movements
+
+	// Add keyboard shortcuts for undo and redo
+	document.addEventListener('keydown', (event) => {
+		if (event.ctrlKey) {
+			switch (event.key) {
+				case 'z':
+					event.preventDefault();
+					undo();
+					break;
+				case 'y':
+					event.preventDefault();
+					redo();
+					break;
+			}
+		}
+	});
 </script>
 
 <!-- Include FontAwesome or your preferred icon library -->
@@ -112,6 +132,12 @@
 		</button>
 		<button on:click={resetStyles}>
 			<i class="fa-solid fa-text-slash"></i>
+		</button>
+		<button on:click={undo}>
+			<i class="fas fa-undo"></i>
+		</button>
+		<button on:click={redo}>
+			<i class="fas fa-redo"></i>
 		</button>
 		<select data-font-size on:change={(event) => applyFontSize(event.target.value)}>
 			<option value="1">10px</option>
