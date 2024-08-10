@@ -111,7 +111,7 @@
 			<i class="fas fa-align-justify"></i>
 		</button>
 		<button on:click={resetStyles}>
-			<i class="fas fa-undo"></i>
+			<i class="fa-solid fa-text-slash"></i>
 		</button>
 		<select data-font-size on:change={(event) => applyFontSize(event.target.value)}>
 			<option value="1">10px</option>
@@ -162,11 +162,11 @@
 		color: #333;
 		transition: color 0.3s ease; /* Smooth transition for hover effect */
 	}
-  .toolbar button{
-    padding: 5px;
-    border-radius: 5px;
-    margin: 5px;
-  }
+	.toolbar button {
+		padding: 5px;
+		border-radius: 5px;
+		margin: 5px;
+	}
 	.toolbar button:hover {
 		background-color: #75757533; /* Change color on hover */
 	}
