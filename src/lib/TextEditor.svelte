@@ -6,11 +6,7 @@
   }
 
   function resetStyles() {
-    clearHTMLTags(editorContent);
-    editorContent.style.textAlign = 'left';  // Reset alignment to default (left)
-  }
-
-  function clearHTMLTags(editorContent) {
+    // Clear HTML Tags
     if (editorContent) {
       // Get the plain text content of the element by using innerText or textContent
       const plainText = editorContent.innerText || editorContent.textContent;
@@ -18,6 +14,8 @@
       // Clear the element's content and set it to the plain text
       editorContent.innerHTML = plainText;
     }
+
+    editorContent.style.textAlign = 'left';  // Reset alignment to default (left)
   }
 
   function getContent() {
@@ -49,13 +47,12 @@
     <button on:click={() => applyStyle('underline')}>Underline</button>
     <button on:click={() => applyStyle('insertOrderedList')}>Ordered List</button>
     <button on:click={() => applyStyle('insertUnorderedList')}>Unordered List</button>
-    <button on:click={() => applyStyle('createLink', prompt('Enter a URL:', 'http://'))}>Link</button>
     <button on:click={() => editorContent.style.textAlign = 'left'}>Align Left</button>
     <button on:click={() => editorContent.style.textAlign = 'center'}>Align Center</button>
     <button on:click={() => editorContent.style.textAlign = 'right'}>Align Right</button>
     <button on:click={() => editorContent.style.textAlign = 'justify'}>Justify</button>
     <button on:click={resetStyles}>Reset Styles</button>
-    <button on:click={getContent}>Get Content</button>
+    <!-- <button on:click={getContent}>Get Content</button> -->
     <select on:change={(event) => applyStyle('fontSize', event.target.value)}>
       <option value="3">Font Size</option>
       <option value="1">10px</option>
