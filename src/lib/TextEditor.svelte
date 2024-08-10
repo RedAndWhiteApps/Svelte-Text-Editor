@@ -45,10 +45,30 @@
 				button.classList.remove('active');
 			}
 		});
+
+		// Font family
+		const fontFamilySelect = document.querySelector('select[data-font-family]');
+		const currentFont = document.queryCommandValue('fontName').replace(/"/g, '');
+		fontFamilySelect.value = currentFont;
+
+		// Font size
+		const fontSizeSelect = document.querySelector('select[data-font-size]');
+		const currentFontSize = document.queryCommandValue('fontSize');
+		fontSizeSelect.value = currentFontSize;
 	}
 
 	function applyAlignment(alignment: string) {
 		editorContent.style.textAlign = alignment;
+		updateActiveButtons(); // Update button styles immediately
+	}
+
+	function applyFontFamily(fontFamily: string) {
+		document.execCommand('fontName', false, fontFamily);
+		updateActiveButtons(); // Update button styles immediately
+	}
+
+	function applyFontSize(fontSize: string) {
+		document.execCommand('fontSize', false, fontSize);
 		updateActiveButtons(); // Update button styles immediately
 	}
 
@@ -93,8 +113,7 @@
 		<button on:click={resetStyles}>
 			<i class="fas fa-undo"></i>
 		</button>
-		<select on:change={(event) => applyStyle('fontSize', event.target.value)}>
-			<option value="3">Font Size</option>
+		<select data-font-size on:change={(event) => applyFontSize(event.target.value)}>
 			<option value="1">10px</option>
 			<option value="2">13px</option>
 			<option value="3">16px</option>
@@ -103,8 +122,7 @@
 			<option value="6">32px</option>
 			<option value="7">48px</option>
 		</select>
-		<select on:change={(event) => applyStyle('fontName', event.target.value)}>
-			<option value="Arial">Font Family</option>
+		<select data-font-family on:change={(event) => applyFontFamily(event.target.value)}>
 			<option value="Arial">Arial</option>
 			<option value="Courier New">Courier New</option>
 			<option value="Georgia">Georgia</option>
@@ -142,16 +160,20 @@
 	.toolbar button i {
 		font-size: 18px;
 		color: #333;
+		transition: color 0.3s ease; /* Smooth transition for hover effect */
 	}
-
-	.toolbar button:hover i {
-		color: #000;
+  .toolbar button{
+    padding: 5px;
+    border-radius: 5px;
+    margin: 5px;
+  }
+	.toolbar button:hover {
+		background-color: #75757533; /* Change color on hover */
 	}
 
 	.toolbar button.active i {
 		color: #007bff; /* Change color for active buttons */
 	}
-
 	.editor {
 		min-height: 200px;
 		outline: none;
