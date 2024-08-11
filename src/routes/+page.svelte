@@ -4,6 +4,7 @@
   
   <main>
     <h1>SvelteKit Text Editor</h1>
+    
     <TextEditor />
   </main>
   

@@ -23,10 +23,13 @@
 	}
 
 	function updateActiveButtons() {
+    const selection = window.getSelection();
+
+    // Ensure the selection is within editorContent
     if (!selection || !selection.anchorNode || !editorContent.contains(selection.anchorNode)) {
-			// If the selection is outside the editorContent, return early
-			return;
-		}
+        // If the selection is outside of the editor, return early
+        return;
+    }
     
 		const commands = ['bold', 'italic', 'underline'];
 		commands.forEach((command) => {
@@ -85,10 +88,11 @@
 		document.execCommand('redo');
 	}
 	onMount(() => {
-		document.addEventListener('selectionchange', updateActiveButtons);
+		// Add click event listener to editorContent
+		editorContent.addEventListener('click', updateActiveButtons);
 
-		// Add keyboard shortcuts for undo, redo, and other formatting
-		document.addEventListener('keydown', (event) => {
+		// Add keyboard shortcuts for undo, redo, and other formatting directly on editorContent
+		editorContent.addEventListener('keydown', (event) => {
 			if (event.ctrlKey) {
 				switch (event.key.toLowerCase()) {
 					case 'z':
