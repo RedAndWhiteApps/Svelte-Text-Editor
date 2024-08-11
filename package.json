@@ -1,6 +1,7 @@
 {
 	"name": "svelte-text-editor",
 	"version": "0.0.1",
+	"description": "A rich text editor component built with Svelte.",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -12,6 +13,12 @@
 		"lint": "prettier --check .",
 		"format": "prettier --write ."
 	},
+	"keywords": [
+    "svelte",
+    "rich-text",
+    "editor",
+    "component"
+  ],
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
