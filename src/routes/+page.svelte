@@ -9,7 +9,5 @@
     <Toolbar className="text-area3" />
     <TextArea className="text-area3"/>
 
-    <Toolbar className="text-area2" />
-    <TextArea className="text-area2"/>
   </main>
   

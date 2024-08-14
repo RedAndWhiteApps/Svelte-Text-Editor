@@ -64,4 +64,4 @@ Apply the CSS class to your components as shown in the usage examples above.
 
 ## License
 
-MIT License
+APACHE License
