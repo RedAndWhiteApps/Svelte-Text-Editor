@@ -1,63 +1,67 @@
 # 🚧 Under Construction 🚧
 
-This project is currently under construction. Please check back later for updates.
+This project is published to the npm library, but still can have some improvements. Feel free to edit.
 
 
-# create-svelte
+---
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+# SVELTE-TEXT-EDITOR
 
-Read more about creating a library [in the docs](https://kit.svelte.dev/docs/packaging).
+This package provides a set of Svelte components, including `Toolbar` and `TextArea`, that can be customized and used to build a user interface with a consistent style. The components support various options for styling and interactivity, as shown in the examples below.
 
-## Creating a project
+## Installation
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+You can install the package via npm:
 
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+npm install svelte-text-editor
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+## Usage
 
-## Building
+### Example 1: Default Styling
 
-To build your library:
+If you don't need specific styles and prefer to use the default appearance of the components, you can omit the `class` prop:
 
-```bash
-npm run package
+```svelte
+<script>
+  import { Toolbar, TextArea } from 'svelte-text-editor';
+</script>
+
+<Toolbar />
+<TextArea />
 ```
 
-To create a production version of your showcase app:
+### Example 2: Styled Toolbar with Editable Paragraph
 
-```bash
-npm run build
+In this example, the `Toolbar` component and an editable `<p>` element are styled using the `text-area1` CSS class. The paragraph (`<p>`) is also made user-editable by setting the `contenteditable` attribute to `true`.
+
+```svelte
+<script>
+  import { Toolbar } from 'svelte-text-editor';
+</script>
+
+<Toolbar class="text-area1" />
+<p class="text-area1" contenteditable="true">Hello there</p>
 ```
 
-You can preview the production build with `npm run preview`.
+## Customization
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+You can customize the appearance of the components by defining your own styles in your CSS file and applying them using the `class` prop.
 
-## Publishing
+Example CSS (`styles.css`):
 
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish 
+```css
+.text-area1 {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  font-family: Arial, sans-serif;
+}
 ```
+
+Apply the CSS class to your components as shown in the usage examples above.
+
+## License
+
+MIT License
