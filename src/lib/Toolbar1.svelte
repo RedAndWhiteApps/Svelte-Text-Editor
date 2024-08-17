@@ -51,15 +51,6 @@
 		}
 	}
 
-	function resetStyles(editorContent: HTMLElement) {
-		if (editorContent) {
-			const plainText = editorContent.innerText || editorContent.textContent;
-			editorContent.innerHTML = plainText;
-			editorContent.style.textAlign = 'left'; // Reset alignment to default (left)
-			updateActiveButtons(); // Update button styles immediately
-		}
-	}
-
 	function getContent(editorContent: HTMLElement) {
 		if (editorContent) {
 			alert(editorContent.innerHTML);
@@ -94,7 +85,9 @@
 		});
 
 		// Font family
-		const fontFamilySelect = document.querySelector('select[data-font-family]') as HTMLSelectElement;
+		const fontFamilySelect = document.querySelector(
+			'select[data-font-family]'
+		) as HTMLSelectElement;
 		if (fontFamilySelect) {
 			const currentFont = document.queryCommandValue('fontName').replace(/"/g, '');
 			fontFamilySelect.value = currentFont;
@@ -140,6 +133,66 @@
 			document.execCommand('redo');
 		}
 	}
+
+	function resetStyles(editorContent: HTMLElement) {
+		if (editorContent) {
+			const plainText = editorContent.innerText || editorContent.textContent;
+			editorContent.innerHTML = plainText;
+			editorContent.style.textAlign = 'left'; // Reset alignment to default (left)
+			updateActiveButtons(); // Update button styles immediately
+		}
+	}
+
+	function deleteParentIfStyle(parentElement: HTMLElement) {
+		const styleTags = ['B', 'STRONG', 'I', 'EM', 'U', 'SPAN']; // Add other tags if needed
+
+		// Stop condition: If parentElement has contenteditable="true" or if it's not a style-related tag
+		if (
+			(parentElement.getAttribute('contenteditable') === 'true') ||
+			!styleTags.includes(parentElement.tagName)
+		) {
+			return; // Exit the function if either condition is met
+		}
+
+		// Check if the parent element is a style-related tag
+		if (parentElement && styleTags.includes(parentElement.tagName)) {
+			// If the parent element is a style-related tag, remove it but keep its children
+			const grandparent = parentElement.parentElement;
+			while (parentElement.firstChild) {
+				grandparent.insertBefore(parentElement.firstChild, parentElement);
+			}
+			grandparent.removeChild(parentElement);
+			deleteParentIfStyle(grandparent); // Recursively check the grandparent
+		}
+	}
+
+	function resetSelectedStyle() {
+		// Step 1: Get the current selection using window.getSelection().
+		const selection = window.getSelection();
+		if (selection?.rangeCount) {
+			const range = selection.getRangeAt(0);
+
+			// Step 2: Clone the selected content and place it in a temporary div.
+			const content = range.cloneContents();
+			const content_textcontent =
+				range.cloneContents().innerText || range.cloneContents().textContent;
+			
+			// Step 3: Remove the original content
+			range.deleteContents();
+
+			// Step 4: Check if it is surrended by a style tag and remove it
+			let parentElement = range.commonAncestorContainer.parentElement;
+			deleteParentIfStyle(parentElement);
+
+
+			// Step 5: Remove the original content and replace it with plain text.
+			range.deleteContents();
+			range.insertNode(document.createTextNode(content_textcontent));
+
+			// Step 6: Optionally, clean up the selection.
+			selection.removeAllRanges();
+		}
+	}
 </script>
 
 <!-- Toolbar and styles remain the same -->
@@ -177,7 +230,7 @@
 		<button data-align="justify" on:click={() => applyAlignment('justify')}>
 			<i class="fas fa-align-justify"></i>
 		</button>
-		<button on:click={resetStyles}>
+		<button on:click={resetSelectedStyle}>
 			<i class="fa-solid fa-text-slash"></i>
 		</button>
 		<button on:click={undo}>
