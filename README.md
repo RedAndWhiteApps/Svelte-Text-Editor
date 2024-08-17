@@ -2,6 +2,11 @@
 
 This project is published to the npm library, but still can have some improvements. Feel free to edit.
 
+#### TODO-LISt
+- [ ] Test toolbar on different screen sizes
+- [ ] Add more Fonts
+- [ ] Add horizontal toolbar
+
 
 ---
 

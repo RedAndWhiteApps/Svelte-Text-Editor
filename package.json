@@ -1,6 +1,6 @@
 {
 	"name": "svelte-text-editor",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "A rich text editor component built with Svelte.",
 	"license": "MIT",
 	"keywords": [
