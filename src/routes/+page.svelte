@@ -2,12 +2,11 @@
     import TextEditor from '$lib/TextEditor.svelte';
     import TextArea from '$lib/TextArea.svelte';
     import Toolbar from '$lib/Toolbar.svelte';
-    import Toolbar1 from '$lib/Toolbar1.svelte';
   </script>
   
   <main>    
     <!-- <TextEditor /> -->
-    <Toolbar1 className="text-area3" />
+    <Toolbar className="text-area3" />
     <TextArea className="text-area3"/>
     <div class="text-area3" contenteditable="true"> Hello there</div>
   </main>

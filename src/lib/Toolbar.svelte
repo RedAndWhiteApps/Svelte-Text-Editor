@@ -1,84 +1,77 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	export let className  = 'erise_text_area1';
-	let editorContent: HTMLElement;
-
+	export let className = 'erise_text_area1';
+	let textareas: NodeListOf<HTMLElement>;
+	let editor: HTMLElement;
 	onMount(() => {
-		
-		// Assign the textarea based on the className 
-		const textarea = document.querySelector('.' + className ) as HTMLElement;
+		// Select all text areas with the given className
+		textareas = document.querySelectorAll('.' + className) as NodeListOf<HTMLElement>;
 
-		if (textarea) {
-			editorContent = textarea;
-
-			// Add click event listener to editorContent
-			editorContent.addEventListener('click', updateActiveButtons);
+		textareas.forEach((textarea) => {
+			// Add click event listener to update the global editorContent and updateActiveButtons
+			textarea.addEventListener('click', (event) => {
+				editor = event.currentTarget as HTMLElement;
+				updateActiveButtons();
+			});
 
 			// Add keyboard shortcuts for undo, redo, and other formatting directly on editorContent
-			editorContent.addEventListener('keydown', (event) => {
-				if (event.ctrlKey) {
-					switch (event.key.toLowerCase()) {
-						case 'z':
-							event.preventDefault();
-							undo();
-							break;
-						case 'y':
-							event.preventDefault();
-							redo();
-							break;
-						case 'b':
-							event.preventDefault();
-							applyStyle('bold');
-							break;
-						case 'i':
-							event.preventDefault();
-							applyStyle('italic');
-							break;
-						case 'u':
-							event.preventDefault();
-							applyStyle('underline');
-							break;
-					}
-				}
-			});
-		} else {
-			console.warn(`No element found with the selector ${className }`);
-		}
+			// Add keyboard shortcuts
+			textarea.addEventListener('keydown', (event) => handleEditorKeydown(event));
+		});
 	});
 
+	function handleEditorKeydown(event: KeyboardEvent) {
+		if (event.ctrlKey) {
+			switch (event.key.toLowerCase()) {
+				case 'z':
+					event.preventDefault();
+					undo();
+					break;
+				case 'y':
+					event.preventDefault();
+					redo();
+					break;
+				case 'b':
+					event.preventDefault();
+					applyStyle('bold');
+					break;
+				case 'i':
+					event.preventDefault();
+					applyStyle('italic');
+					break;
+				case 'u':
+					event.preventDefault();
+					applyStyle('underline');
+					break;
+			}
+		}
+	}
+
+	// Function to check if the clicked element is inside a textarea
+	function isClickInsideTextarea(event: MouseEvent): boolean {
+		// Get the element that was clicked
+		let element = event.target as HTMLElement;
+
+		// Check if the clicked element or any of its parents is a textarea
+		for (let i = 0; i < textareas.length; i++) {
+			if (textareas[i].contains(element)) {
+				return true; // The click occurred inside a textarea
+			}
+		}
+		return false; // The click did not occur inside any textarea
+	}
+
 	function applyStyle(style: string, value: string = '') {
-		if (editorContent) {
-			document.execCommand(style, false, value);
-			updateActiveButtons(); // Update button styles immediately
-		}
-	}
-
-	function resetStyles() {
-		if (editorContent) {
-			const plainText = editorContent.innerText || editorContent.textContent;
-			editorContent.innerHTML = plainText;
-			editorContent.style.textAlign = 'left'; // Reset alignment to default (left)
-			updateActiveButtons(); // Update button styles immediately
-		}
-	}
-
-	function getContent() {
-		if (editorContent) {
-			alert(editorContent.innerHTML);
-		}
+		document.execCommand(style, false, value);
+		updateActiveButtons(); // Update button styles immediately
 	}
 
 	function updateActiveButtons() {
-		if (!editorContent) return;
-
 		const selection = window.getSelection();
 
-		// Ensure the selection is within editorContent
-		if (!selection || !selection.anchorNode || !editorContent.contains(selection.anchorNode)) {
-			// If the selection is outside of the editor, return early
-			return;
-		}
+		// Ensure the selection is within one of the editorContent elements
+		if (!selection || !selection.anchorNode) return;
 
 		const commands = ['bold', 'italic', 'underline'];
 		commands.forEach((command) => {
@@ -94,7 +87,7 @@
 		const alignments = ['left', 'center', 'right', 'justify'];
 		alignments.forEach((align) => {
 			const button = document.querySelector(`button[data-align=${align}]`);
-			if (editorContent.style.textAlign === align) {
+			if ((selection.anchorNode?.parentNode as HTMLElement)?.style?.textAlign === align) {
 				button?.classList.add('active');
 			} else {
 				button?.classList.remove('active');
@@ -119,44 +112,100 @@
 	}
 
 	function applyAlignment(alignment: string) {
-		if (editorContent) {
-			editorContent.style.textAlign = alignment;
-			updateActiveButtons(); // Update button styles immediately
-		}
+		
+		editor.style.textAlign = alignment;
+		updateActiveButtons(); // Update button styles immediately
 	}
 
 	function applyFontFamily(fontFamily: string) {
-		if (editorContent) {
-			document.execCommand('fontName', false, fontFamily);
-			updateActiveButtons(); // Update button styles immediately
-		}
+		
+
+		document.execCommand('fontName', false, fontFamily);
+		updateActiveButtons(); // Update button styles immediately
 	}
 
 	function applyFontSize(fontSize: string) {
-		if (editorContent) {
-			document.execCommand('fontSize', false, fontSize);
-			updateActiveButtons(); // Update button styles immediately
-		}
+		
+		document.execCommand('fontSize', false, fontSize);
+		updateActiveButtons(); // Update button styles immediately
 	}
 
 	function undo() {
-		if (editorContent) {
-			document.execCommand('undo');
-		}
+		document.execCommand('undo');
 	}
 
 	function redo() {
-		if (editorContent) {
-			document.execCommand('redo');
+		document.execCommand('redo');
+	}
+
+	function deleteParentIfStyle(parentElement: HTMLElement) {
+		const styleTags = ['B', 'STRONG', 'I', 'EM', 'U', 'SPAN', 'UL', 'LI', 'OL']; // Add other tags if needed
+		// Stop condition: If parentElement has contenteditable="true" or if it's not a style-related tag
+		if (
+			parentElement.getAttribute('contenteditable') === 'true' ||
+			!styleTags.includes(parentElement.tagName)
+		) {
+			return; // Exit the function if either condition is met
 		}
+
+		// Check if the parent element is a style-related tag
+		if (parentElement && styleTags.includes(parentElement.tagName)) {
+			// If the parent element is a style-related tag, remove it but keep its children
+			const grandparent = parentElement.parentElement;
+			while (parentElement.firstChild) {
+				grandparent.insertBefore(parentElement.firstChild, parentElement);
+			}
+			grandparent.removeChild(parentElement);
+			deleteParentIfStyle(grandparent); // Recursively check the grandparent
+		}
+	}
+
+	function resetSelectedStyle() {
+		// Step 1: Get the current selection using window.getSelection().
+		const selection = window.getSelection();
+		if (selection?.rangeCount) {
+			const range = selection.getRangeAt(0);
+
+			// Step 2: Clone the selected content and place it in a temporary div.
+			const content = range.cloneContents();
+			let content_textcontent =
+				range.cloneContents().innerText || range.cloneContents().textContent;
+
+			// Step 3: Remove the original content
+			range.deleteContents();
+
+			// Step 4: Check if it is surrended by a style tag and remove it
+			let parentElement = range.commonAncestorContainer.parentElement;
+
+			if (parentElement.getAttribute('contenteditable') === 'true') {
+				// If parent is the original div, replace its content with plain text
+				const plainText = parentElement.innerText || parentElement.textContent;
+				parentElement.innerHTML = plainText;
+			} else {
+				// Function to check and delete the parent if it has certain styles
+				deleteParentIfStyle(parentElement);
+			}
+
+			// Step 5: Remove the original content and replace it with plain text.
+			range.deleteContents();
+			range.insertNode(document.createTextNode(content_textcontent));
+
+			// Step 6: Optionally, clean up the selection.
+			selection.removeAllRanges();
+		}
+		applyAlignment('left')
+		updateActiveButtons();
 	}
 </script>
 
-
-<!-- Include FontAwesome or your preferred icon library -->
+<!-- Toolbar and styles remain the same -->
 <link
 	rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+/>
+<link
+	href="https://fonts.googleapis.com/css2?family=Amatic+SC&family=Baloo+2:wght@400;500;700&family=Caveat&family=Fredoka+One&family=Gaegu&family=Pangolin&family=Quicksand:wght@400;500;600&family=Raleway:wght@400;500;600&display=swap"
+	rel="stylesheet"
 />
 
 <div>
@@ -188,7 +237,7 @@
 		<button data-align="justify" on:click={() => applyAlignment('justify')}>
 			<i class="fas fa-align-justify"></i>
 		</button>
-		<button on:click={resetStyles}>
+		<button on:click={resetSelectedStyle}>
 			<i class="fa-solid fa-text-slash"></i>
 		</button>
 		<button on:click={undo}>
@@ -212,17 +261,16 @@
 			<option value="Georgia">Georgia</option>
 			<option value="Times New Roman">Times New Roman</option>
 			<option value="Verdana">Verdana</option>
+			<option value="Amatic SC">Amatic SC</option>
+			<option value="Baloo 2">Baloo 2</option>
+			<option value="Caveat">Caveat</option>
+			<option value="Fredoka One">Fredoka One</option>
+			<option value="Gaegu">Gaegu</option>
+			<option value="Pangolin">Pangolin</option>
+			<option value="Quicksand">Quicksand</option>
+			<option value="Raleway">Raleway</option>
 		</select>
 	</div>
-
-	<!-- <div class="editor-container">
-		<div
-			class="editor"
-			contenteditable="true"
-			bind:this={editorContent}
-			placeholder="Type here..."
-		></div>
-	</div> -->
 </div>
 
 <style>
