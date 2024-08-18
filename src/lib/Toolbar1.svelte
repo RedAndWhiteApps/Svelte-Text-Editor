@@ -3,46 +3,72 @@
 
 	export let className = 'erise_text_area1';
 	let textareas: NodeListOf<HTMLElement>;
+	let editor: HTMLElement;
 	onMount(() => {
 		// Select all text areas with the given className
 		textareas = document.querySelectorAll('.' + className) as NodeListOf<HTMLElement>;
 
 		textareas.forEach((textarea) => {
-			// Assign the textarea element
-			const editorContent = textarea;
-
-			// Add click event listener to editorContent
-			editorContent.addEventListener('click', updateActiveButtons);
+			// Add click event listener to update the global editorContent and updateActiveButtons
+			textarea.addEventListener('click', (event) => {
+				editor = event.currentTarget as HTMLElement;
+				updateActiveButtons();
+				console.log('editorContent', editor);
+			});
 
 			// Add keyboard shortcuts for undo, redo, and other formatting directly on editorContent
-			editorContent.addEventListener('keydown', (event) => {
-				if (event.ctrlKey) {
-					switch (event.key.toLowerCase()) {
-						case 'z':
-							event.preventDefault();
-							undo(editorContent);
-							break;
-						case 'y':
-							event.preventDefault();
-							redo(editorContent);
-							break;
-						case 'b':
-							event.preventDefault();
-							applyStyle('bold', editorContent);
-							break;
-						case 'i':
-							event.preventDefault();
-							applyStyle('italic', editorContent);
-							break;
-						case 'u':
-							event.preventDefault();
-							applyStyle('underline', editorContent);
-							break;
-					}
-				}
-			});
+			// Add keyboard shortcuts
+			textarea.addEventListener('keydown', (event) => handleEditorKeydown(event));
 		});
 	});
+
+	function handleEditorKeydown(event: KeyboardEvent) {
+		if (event.ctrlKey) {
+			switch (event.key.toLowerCase()) {
+				case 'z':
+					event.preventDefault();
+					undo();
+					break;
+				case 'y':
+					event.preventDefault();
+					redo();
+					break;
+				case 'b':
+					event.preventDefault();
+					applyStyle('bold');
+					break;
+				case 'i':
+					event.preventDefault();
+					applyStyle('italic');
+					break;
+				case 'u':
+					event.preventDefault();
+					applyStyle('underline');
+					break;
+			}
+		}
+	}
+
+	// Function to check if the clicked element is inside a textarea
+	function isClickInsideTextarea(event: MouseEvent): boolean {
+		// Get the element that was clicked
+		let element = event.target as HTMLElement;
+
+		// Check if the clicked element or any of its parents is a textarea
+		for (let i = 0; i < textareas.length; i++) {
+			if (textareas[i].contains(element)) {
+				return true; // The click occurred inside a textarea
+			}
+		}
+		return false; // The click did not occur inside any textarea
+	}
+
+	// function getEditorContent() {
+	// 	const selection = window.getSelection();
+	// 	console.log('selection', selection);
+	// 	const parentTextArea = getParentTextArea(selection.anchorNode?.parentElement as HTMLElement);
+	// 	return parentTextArea;
+	// }
 
 	function getParentTextArea(element: HTMLElement): HTMLElement {
 		if (element.getAttribute('contenteditable') === 'true') {
@@ -52,20 +78,9 @@
 		}
 	}
 
-	function applyStyle(style: string, editorContent: HTMLElement = null, value: string = '') {
-		if(editorContent === null) {
-			const selection = window.getSelection();
-			const parentTextArea = getParentTextArea(selection.anchorNode?.parentElement as HTMLElement);
-			if (Array.from(textareas).includes(parentTextArea)) {
-				document.execCommand(style, false, value);
-				updateActiveButtons(); // Update button styles immediately
-			}
-		} else {
-			if (Array.from(textareas).includes(editorContent)) {
-				document.execCommand(style, false, value);
-				updateActiveButtons(); // Update button styles immediately
-			}
-		}
+	function applyStyle(style: string, value: string = '') {
+		document.execCommand(style, false, value);
+		updateActiveButtons(); // Update button styles immediately
 	}
 
 	function updateActiveButtons() {
@@ -112,37 +127,31 @@
 		}
 	}
 
-	function applyAlignment(alignment: string, editorContent: HTMLElement) {
-		if (Array.from(textareas).includes(editorContent)) {
-			editorContent.style.textAlign = alignment;
-			updateActiveButtons(); // Update button styles immediately
-		}
+	function applyAlignment(alignment: string) {
+		
+		editor.style.textAlign = alignment;
+		updateActiveButtons(); // Update button styles immediately
 	}
 
-	function applyFontFamily(fontFamily: string, editorContent: HTMLElement) {
-		if (Array.from(textareas).includes(editorContent)) {
-			document.execCommand('fontName', false, fontFamily);
-			updateActiveButtons(); // Update button styles immediately
-		}
+	function applyFontFamily(fontFamily: string) {
+		
+
+		document.execCommand('fontName', false, fontFamily);
+		updateActiveButtons(); // Update button styles immediately
 	}
 
-	function applyFontSize(fontSize: string, editorContent: HTMLElement) {
-		if (Array.from(textareas).includes(editorContent)) {
-			document.execCommand('fontSize', false, fontSize);
-			updateActiveButtons(); // Update button styles immediately
-		}
+	function applyFontSize(fontSize: string) {
+		
+		document.execCommand('fontSize', false, fontSize);
+		updateActiveButtons(); // Update button styles immediately
 	}
 
-	function undo(editorContent: HTMLElement) {
-		if (Array.from(textareas).includes(editorContent)) {
-			document.execCommand('undo');
-		}
+	function undo() {
+		document.execCommand('undo');
 	}
 
-	function redo(editorContent: HTMLElement) {
-		if (Array.from(textareas).includes(editorContent)) {
-			document.execCommand('redo');
-		}
+	function redo() {
+		document.execCommand('redo');
 	}
 
 	function deleteParentIfStyle(parentElement: HTMLElement) {
@@ -208,8 +217,10 @@
 	rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
 />
-<link href="https://fonts.googleapis.com/css2?family=Amatic+SC&family=Baloo+2:wght@400;500;700&family=Caveat&family=Fredoka+One&family=Gaegu&family=Pangolin&family=Quicksand:wght@400;500;600&family=Raleway:wght@400;500;600&display=swap" rel="stylesheet">
-
+<link
+	href="https://fonts.googleapis.com/css2?family=Amatic+SC&family=Baloo+2:wght@400;500;700&family=Caveat&family=Fredoka+One&family=Gaegu&family=Pangolin&family=Quicksand:wght@400;500;600&family=Raleway:wght@400;500;600&display=swap"
+	rel="stylesheet"
+/>
 
 <div>
 	<div class="toolbar">
