@@ -2,10 +2,10 @@
 	import { onMount } from 'svelte';
 
 	export let className = 'erise_text_area1';
-
+	let textareas: NodeListOf<HTMLElement>;
 	onMount(() => {
 		// Select all text areas with the given className
-		const textareas = document.querySelectorAll('.' + className) as NodeListOf<HTMLElement>;
+		textareas = document.querySelectorAll('.' + className) as NodeListOf<HTMLElement>;
 
 		textareas.forEach((textarea) => {
 			// Assign the textarea element
@@ -44,10 +44,27 @@
 		});
 	});
 
-	function applyStyle(style: string, editorContent: HTMLElement, value: string = '') {
-		if (editorContent) {
-			document.execCommand(style, false, value);
-			updateActiveButtons(); // Update button styles immediately
+	function getParentTextArea(element: HTMLElement): HTMLElement {
+		if (element.getAttribute('contenteditable') === 'true') {
+			return element;
+		} else {
+			return getParentTextArea(element.parentElement);
+		}
+	}
+
+	function applyStyle(style: string, editorContent: HTMLElement = null, value: string = '') {
+		if(editorContent === null) {
+			const selection = window.getSelection();
+			const parentTextArea = getParentTextArea(selection.anchorNode?.parentElement as HTMLElement);
+			if (Array.from(textareas).includes(parentTextArea)) {
+				document.execCommand(style, false, value);
+				updateActiveButtons(); // Update button styles immediately
+			}
+		} else {
+			if (Array.from(textareas).includes(editorContent)) {
+				document.execCommand(style, false, value);
+				updateActiveButtons(); // Update button styles immediately
+			}
 		}
 	}
 
@@ -96,34 +113,34 @@
 	}
 
 	function applyAlignment(alignment: string, editorContent: HTMLElement) {
-		if (editorContent) {
+		if (Array.from(textareas).includes(editorContent)) {
 			editorContent.style.textAlign = alignment;
 			updateActiveButtons(); // Update button styles immediately
 		}
 	}
 
 	function applyFontFamily(fontFamily: string, editorContent: HTMLElement) {
-		if (editorContent) {
+		if (Array.from(textareas).includes(editorContent)) {
 			document.execCommand('fontName', false, fontFamily);
 			updateActiveButtons(); // Update button styles immediately
 		}
 	}
 
 	function applyFontSize(fontSize: string, editorContent: HTMLElement) {
-		if (editorContent) {
+		if (Array.from(textareas).includes(editorContent)) {
 			document.execCommand('fontSize', false, fontSize);
 			updateActiveButtons(); // Update button styles immediately
 		}
 	}
 
 	function undo(editorContent: HTMLElement) {
-		if (editorContent) {
+		if (Array.from(textareas).includes(editorContent)) {
 			document.execCommand('undo');
 		}
 	}
 
 	function redo(editorContent: HTMLElement) {
-		if (editorContent) {
+		if (Array.from(textareas).includes(editorContent)) {
 			document.execCommand('redo');
 		}
 	}
@@ -191,6 +208,8 @@
 	rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
 />
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC&family=Baloo+2:wght@400;500;700&family=Caveat&family=Fredoka+One&family=Gaegu&family=Pangolin&family=Quicksand:wght@400;500;600&family=Raleway:wght@400;500;600&display=swap" rel="stylesheet">
+
 
 <div>
 	<div class="toolbar">
@@ -245,21 +264,16 @@
 			<option value="Georgia">Georgia</option>
 			<option value="Times New Roman">Times New Roman</option>
 			<option value="Verdana">Verdana</option>
+			<option value="Amatic SC">Amatic SC</option>
+			<option value="Baloo 2">Baloo 2</option>
+			<option value="Caveat">Caveat</option>
+			<option value="Fredoka One">Fredoka One</option>
+			<option value="Gaegu">Gaegu</option>
+			<option value="Pangolin">Pangolin</option>
+			<option value="Quicksand">Quicksand</option>
+			<option value="Raleway">Raleway</option>
 		</select>
 	</div>
-
-	<!-- 
-		Replace the below commented code with your dynamic textareas.
-		Each textarea needs to have the `className` (e.g., 'erise_text_area1') 
-		class applied for the script to detect and apply the functionality.
-	-->
-	<!-- <div class="editor-container">
-		<div
-			class="editor erise_text_area1"
-			contenteditable="true"
-			placeholder="Type here..."
-		></div>
-	</div> -->
 </div>
 
 <style>
