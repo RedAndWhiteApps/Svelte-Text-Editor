@@ -51,12 +51,6 @@
 		}
 	}
 
-	function getContent(editorContent: HTMLElement) {
-		if (editorContent) {
-			alert(editorContent.innerHTML);
-		}
-	}
-
 	function updateActiveButtons() {
 		const selection = window.getSelection();
 
@@ -134,21 +128,11 @@
 		}
 	}
 
-	function resetStyles(editorContent: HTMLElement) {
-		if (editorContent) {
-			const plainText = editorContent.innerText || editorContent.textContent;
-			editorContent.innerHTML = plainText;
-			editorContent.style.textAlign = 'left'; // Reset alignment to default (left)
-			updateActiveButtons(); // Update button styles immediately
-		}
-	}
-
 	function deleteParentIfStyle(parentElement: HTMLElement) {
 		const styleTags = ['B', 'STRONG', 'I', 'EM', 'U', 'SPAN']; // Add other tags if needed
-
 		// Stop condition: If parentElement has contenteditable="true" or if it's not a style-related tag
 		if (
-			(parentElement.getAttribute('contenteditable') === 'true') ||
+			parentElement.getAttribute('contenteditable') === 'true' ||
 			!styleTags.includes(parentElement.tagName)
 		) {
 			return; // Exit the function if either condition is met
@@ -174,16 +158,23 @@
 
 			// Step 2: Clone the selected content and place it in a temporary div.
 			const content = range.cloneContents();
-			const content_textcontent =
+			let content_textcontent =
 				range.cloneContents().innerText || range.cloneContents().textContent;
-			
+
 			// Step 3: Remove the original content
 			range.deleteContents();
 
 			// Step 4: Check if it is surrended by a style tag and remove it
 			let parentElement = range.commonAncestorContainer.parentElement;
-			deleteParentIfStyle(parentElement);
 
+			if (parentElement.getAttribute('contenteditable') === 'true') {
+				// If parent is the original div, replace its content with plain text
+				const plainText = parentElement.innerText || parentElement.textContent;
+				parentElement.innerHTML = plainText;
+			} else {
+				// Function to check and delete the parent if it has certain styles
+				deleteParentIfStyle(parentElement);
+			}
 
 			// Step 5: Remove the original content and replace it with plain text.
 			range.deleteContents();
